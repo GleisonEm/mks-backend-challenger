@@ -10,11 +10,12 @@ services:
       - ${NODE_API_PORT}:${NODE_API_PORT}
     links:
       - db
+    networks:
+      - mynet
 
   db:
     image: postgres
     volumes:
-      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./postgresql.conf:/docker-entrypoint-initdb.d/postgresql.conf
     command: postgres -c config_file=/docker-entrypoint-initdb.d/postgresql.conf
     environment:
@@ -29,6 +30,8 @@ services:
       interval: 3s
       timeout: 5s
       retries: 10
+    networks:
+      - mynet
 
   redis:
     image: redis
@@ -40,6 +43,8 @@ services:
       interval: 3s
       timeout: 5s
       retries: 10
+    networks:
+      - mynet
 
   redis-commander:
     container_name: redis-commander
@@ -52,11 +57,12 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+    networks:
+      - mynet
 
   db-test:
     image: postgres
     volumes:
-      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./postgresql.conf:/docker-entrypoint-initdb.d/postgresql.conf
     command: postgres -c config_file=/docker-entrypoint-initdb.d/postgresql.conf
     environment:
@@ -71,3 +77,9 @@ services:
       interval: 3s
       timeout: 5s
       retries: 10
+    networks:
+      - mynet
+
+networks:
+  mynet:
+    driver: bridge
